@@ -1,0 +1,168 @@
+\documentclass{article}
+
+%\VignetteIndexEntry{iPAC: identification of Protein Amino acid Mutations}
+%\VignetteDepends{iPAC, igraph, TSP, RMallow}
+%\VignetteKeywords{Clusters, Amino Acids, Alignment, CIF,Somatic Mutations, NMC}
+%\VignettePackage{iPac}
+
+%% packages
+\usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{subfigure}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{Sweave}
+
+
+\def \GraphPAC{\textbf{GraphPAC}}
+\def \iPAC{\textbf{iPAC}}
+\def \TSP{\textbf{TSP}}
+\def \igraph{\textbf{igraph}}
+\def \RMallow{\textbf{RMallow}}
+
+\begin{document}
+
+  \title{\GraphPAC{}: Graph Theoretical Identification of Mutated Amino Acid Clusters in Proteins }
+  \author{Gregory Ryslik  \\ Yale University  \\ gregory.ryslik@yale.edu
+          \and
+            Hongyu Zhao \\ Yale University \\ hongyu.zhao@yale.edu}
+
+\maketitle
+
+\begin{abstract}
+  
+\end{abstract}
+  The \GraphPAC{} package is a novel tool that identifies clusters of mutated amino acids in proteins by using graph theory to take into account protein tertiary structure. Specifically, the protein is mapped onto a one dimensional space by solving the Traveling Salesman Problem (TSP) heuristically via the \TSP{} package \citep{TSP}. Once a hueristic solution to the TSP has been found, the protein is reorganized to a one-dimensional space by walking the path from the first amino acid to the last. The \emph{Nonrandom Mutation Clustering} (NMC) \citep{ye_2010} algorithm is then run on the reordered protein to identify if any pairwise mutations are closer together than expected by chance alone.  \GraphPAC{} is designed to be a companion package to \iPAC{} \citep{iPAC} and provides the researcher with a different toolset to identify mutational clusters. By using a graph theoretical approach to map the protein to a one dimesional spacing, mutational clusters that are otherwise missed by the \emph{NMC} and \iPAC{} algorithms are found. 
+
+\section{Introduction} \label{intro}
+
+Due to recent pharmacological advances in treating tumorogenic driver mutations \citep{croce_oncogenes_2008}, several methods have been developed to identify amino acid mutational clusters. One of the most recent methods, \emph{NMC} considered all pairwise mutations and identified those that are closer than expected by chance alone under the assumption that each amino acid has an equal probability of mutation. \emph{NMC}, which considers the protein linearly might potentially exclude amino acids that are close together in 3D space but far apart in 1D space. To address this issue, the \iPAC{} methodology \citep{iPAC} reorganized the protein via MultiDimensional Scaling (MDS) \citep{borg_modern_1997}. This package is designed to overcome the reliance on MDS and provides the researcher a different toolset for identifying mutational clusters. \\
+
+Under a MDS approach, ever pairwise distance between amino acids is considered when the protein is mapped to a one dimensional space. Thus, amino acids that are very far apart from each other in 3D space still influence each other's final position in 1D space. The graph theoretical approach does not suffer from this limitation and would be more effective in reorganizing proteins that have several domains which are connected by domain linkers (see Figure \ref{oddprotein}). By solving the TSP, we attempt to find the shortest path between all the amino acids. Amino acids that are in the same region of space (such as in a specific domain) will likely be close to each other in the path, while amino acids that are far apart in space (seperated by one or more domain linkers) will be far apart in the final path. \\ \\
+\begin{figure}[htb!*]
+\centering
+\includegraphics {OddProtein.jpeg}
+\caption{Possible Protein Arrangement of domain linkers and domains. The amino acids on the very left should have no effect on the reordering position of the amino acids on the right.}
+\label{oddprotein}
+\end{figure}
+
+In order to run the clustering methodology we will describe below, 3 types of data are required. First, you need the amino acid sequence of the protein. Second, you need the protein tertiary structure and third you need the somatic mutational data. The amino acid sequence is obtained from the Sanger Institute and the protein tertiary structure is obtained from the PDB database. \\\\ An alignment (or other reconciliation) must be done in order to match the structural data with the amino acid sequence. Once that's done, the structural data is then matched with the mutational data which is obtained from the COSMIC database. The raw mutational data is available from the COSMIC website as a SQL database. Additional prior work is necessary to set up a local copy of the database and create the appropriate queries required to extract the mutational data. However, the end result is simply a $n\times m$ matrix where there are n samples for a protein which has a total of m amino acids. A ``1" in the (i, j) position signifies that sample i had a mutation in amino acid j. If you have your own mutational data, you do not need to acess the COSMIC database and can simply create the mutational matrix described. Please ensure that your mutational matrix has the default R column headings of "V1,V2...Vm" where m is the number of the last amino acid in the protein.\\ \\ We provide sample mutational data for the PIK3C$\alpha$ and KRAS proteins. We also provide a brief description of how to obtain the amino acid sequence and the tertiary structure data in Code Example 1. For a full description of how to extract the correct mutational and positional data (via such functions as \emph{get.Positions()} and \emph{get.AlignedPositions()}), along with a description of the NMC algorithm please refer to the documentation provided in the \iPAC {} package. \\ \\
+For the rest of this vignette, we will assume the user is familiar with these functions. \\ \\
+If users want to contribute to the code base, please contact the author.
+
+\section{Finding Clusters in 3D Space via Graph Theory} \label{maincalc}
+
+Once the appropriate positional and mutational data has been loaded, the \emph{GraphClust} function is run to identify the mutational clusters. Specifically, \emph{GraphClust} will first reorder the protein by solving the TSP using one of the four insertion methods available in the \TSP{} package (nearest, farthest, cheapest and arbitrary instertion). Once the protein is reordered, the mutational clusters are found and reported back to the user. An example of the code and ouput is shown in \emph{Example 1} below. \\ \\ \\
+
+
+\begin{verbatim}
+Code Example 1: Running the GraphClust using the cheapest insertion method
+\end{verbatim}
+\begin{small}
+<<label=Example1,echo=true, fig=FALSE,eval = TRUE>>=
+library(GraphPAC)
+#Extract the data from a CIF file and match it up with the canonical protein sequence.
+#Here we use the 3GFT structure from the PDB, which corresponds to the KRAS protein.
+CIF<-"http://www.pdb.org/pdb/files/3GFT.cif"
+Fasta<-"http://www.sanger.ac.uk/perl/genetics/CGP/cosmic_sequence?ln=KRAS;format=aa"
+KRAS.Positions<-get.Positions(CIF,Fasta, "A")
+
+#Load the mutational data for KRAS. Here the mutational data was obtained from the
+#COSMIC database (version 58). 
+data(KRAS.Mutations)
+
+#Identify and report the clusters. 
+my.graph.clusters <- GraphClust(KRAS.Mutations,KRAS.Positions$Positions,
+                                insertion.type = "cheapest_insertion",
+                                alpha = 0.05, MultComp = "Bonferroni")
+my.graph.clusters
+@
+\end{small}
+
+As we can see, the first 3 elements returned, \emph{Remapped, OriginalCulled, and Original} are similar to those returned by \iPAC. The \emph{Remapped} element returns the clusters after the protein is reordered using the graph theory methodology described above. The \emph{OriginalCulled} element returns the clusters found when the protein is considered linearly (with no reordering) but with all the amino acids that don't have positional data removed. The \emph{Original} element shows the clustering results as found by the original NMC algorithm without taking any of the positional data into account. \\
+
+The next 3 elements provide information regarding the path that was found by solving the TSP. The \emph{candidate.path} element displays the actual path found. The \emph{path.distance} element shows the total distance if one were to traverse the protein in the remapped order. The \emph{linear.path.distance} element shows the total distance if one were to traverse the protein in the original linear form from the first to the last (Nth) amino acid: $1 \rightarrow 2 \rightarrow 3\rightarrow ...\rightarrow N$ (the amino acids that had no positional data are skipped). The distance provided in \emph{path.distance} and \emph{linear.path.distance} are measured in angstroms (\AA). \\
+
+The \emph{protein.graph} element is a graph structure as defined in the the \igraph{} package \citep{igraph}. Specifically, each amino acid is treated as a vertex. Then a directed edge from vertex i to vertex j is added if and only if the traveling salesman solution has the path going from i to j. This element is passed to the \emph{plot.protein} function described in Section \ref{circlejump} below.\\
+
+Finally, the \emph{missing.positions} element provides a matrix that details which amino acids did not have positional data. These amino acids are removed when calculating clusters for the \emph{Remapped} and \emph{OriginalCulled} elements.
+
+
+\section{Plotting} \label{Plotting}
+
+Two types of plots have been implemented so far. Please ensure that you are using a terminal capable of graphical output before running these commands. 
+
+\subsection{Jump Plots} \label{jumpplot}
+A jump plot displays the protein as matrix. The number of columns are specified by the user allowing control over how wide the resulting picture is. Once the color palette is selected, each element is then colored in with a different color which designates the position of the amino acid in the reordered protein.
+
+\begin{verbatim}
+Code Example 2: Making a Jump Plot
+\end{verbatim}
+\begin{small}
+<<label=Example2a,echo=true, fig=TRUE,eval = TRUE, include= false>>=
+#Using the heat color palette
+Plot.Protein.Linear(my.graph.clusters$candidate.path, 25, color.palette = "heat", 
+                    title = "Protein Reordering - Heat Map")
+@
+<<label=Example2b,echo=true, fig=TRUE,eval = TRUE, include = false>>=
+#Using the gray color palette
+Plot.Protein.Linear(my.graph.clusters$candidate.path, 25, color.palette = "gray",
+                    title = "Protein Reordering - Gray Color Scale")
+@
+\end{small}
+\setkeys{Gin}{width=.92\textwidth}
+\begin{center}
+\includegraphics{GraphPAC-Example2a.pdf}
+\includegraphics{GraphPAC-Example2b.pdf}
+\end{center}
+
+From the plot using the ``heat" palette, we can see that the firt jump occurs from amino acid 6 to 7 since the color becomes much closer to red. Another large jump occurs between amino acids 64 to 67. Since the ``heat" color palette ordering goes from white to red, amino acids that are reordered to the end of the protein will have a much redder color than those in the beginning. Similarly, amino acids reordered to the beginning of the protein will be almost completley white. Please run ``?Plot.Protein.Linear" for a full description of the graphical parameters available for this function.
+
+\subsection{Interactive Circle Jump Plots} \label{circlejump}
+In addition to the static plot described in Section \ref{jumpplot}, a circular jump plot allows for you to interactively see the graph. The plot use a TCL/TK window to plot the protein in circular form. The color coding of each amino acid represents it's position in the reordered protein in the same way as for regular Jump Plots. However, one can click and drag any amino acid in the window to see exactly how the edges connect. \\ 
+
+Below we provide pictures of the circle plot as created by the algorithm and then the circle plot after manually adjusting the position of some vertices. As there are many vertices, please zoom in on the pdf to see all the details. For more information, run "?Plot.Protein". Finally, this function is a wrapper to the \emph{tkplot} function in the \igraph{} package, please look there for full technical specifications and additional options. \\
+
+Special thanks to Dr. G\'{a}bor Cs\'{a}rdi (creator of the \igraph{} package) for his help.
+
+\begin{verbatim}
+Code Example 3: Making a Circle Jump Plot
+\end{verbatim}
+\begin{small}
+<<label=Example3,echo=true, fig=FALSE,eval = FALSE>>=
+
+#Using the heat color palette
+Plot.Protein(my.graph.clusters$protein.graph, my.graph.clusters$candidate.path,
+             vertex.size=5, color.palette="heat")
+@
+\end{small}
+
+\begin{center}
+\setkeys{Gin}{width=1.35\textwidth}
+\includegraphics{KRASCircle.pdf}
+\setkeys{Gin}{width=1.35\textwidth}
+\includegraphics{KRASCircleAdjusted.pdf}
+\end{center}
+
+\section{Comparing Path Differences} \label{Comparisons}
+In addition to the graphical options provided above, one might want to consider a numerical measure of the reordering of the amino acid when comparing the \iPAC{} and \GraphPAC{} methodologies. One possible measure could be Kendall's Tau \citep{KendallTau} which is equivalent to the number of reorderings performed during a bubble sort. This can be easily done via the \RMallow{} package \citep{RMallow}.
+
+\begin{small}
+<<label=Example4,echo=true, fig=FALSE,eval = TRUE>>=
+library(RMallow)
+graph.path <-my.graph.clusters$candidate.path
+
+#get.Remapped.Order is a function in the \iPAC package
+mds.path <- get.Remapped.Order(KRAS.Mutations,KRAS.Positions$Positions)
+
+path.matrix <- rbind (original.seq = sort(graph.path), graph.path, mds.path)
+AllSeqDists(path.matrix)
+@
+\end{small}
+
+Observe that the ``original.seq" value will always be 0 since the original protein is already in order. 
+
+\bibliography{refs}{}
+\bibliographystyle{plainnat}
+
+\end{document}
