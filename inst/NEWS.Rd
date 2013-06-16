@@ -7,3 +7,8 @@
     \item Insertion methods allowed are cheapest, nearest, farthest and random.
   }
 }
+\section{Release Notes for version 1.2.0 - 2013.06.16}{
+  \itemize{
+    \item Due to COSMIC change in the way the FASTA files are displayed, the examples now pull information from Uniprot.
+  }
+}

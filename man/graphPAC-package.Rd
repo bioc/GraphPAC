@@ -37,7 +37,7 @@ Bioconductor: Open software development for computational biology and bioinforma
 \dontrun{
 #Load the positional and mutatioanl data
 CIF<-"http://www.pdb.org/pdb/files/3GFT.cif"
-Fasta<-"http://www.sanger.ac.uk/perl/genetics/CGP/cosmic_sequence?ln=KRAS;format=aa"
+Fasta<-"http://www.uniprot.org/uniprot/P01116-2.fasta"
 KRAS.Positions<-get.Positions(CIF,Fasta, "A")
 data(KRAS.Mutations)
 
