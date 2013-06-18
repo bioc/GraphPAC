@@ -45,7 +45,7 @@ Gregory Ryslik and Hongyu Zhao (2012). iPAC: Identification of Protein Amino aci
 \examples{
 #Load the position and mutational data
 CIF<-"http://www.pdb.org/pdb/files/3GFT.cif"
-Fasta<-"http://www.sanger.ac.uk/perl/genetics/CGP/cosmic_sequence?ln=KRAS;format=aa"
+Fasta<-"http://www.uniprot.org/uniprot/P01116-2.fasta"
 KRAS.Positions<-get.Positions(CIF,Fasta, "A")
 data(KRAS.Mutations)
 
