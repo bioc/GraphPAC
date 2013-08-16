@@ -7,7 +7,7 @@ test_GraphClust  <- function() {
   ZCoord <- c(30.223,27.079,24.308,20.615)
   
   mutation.matrix <-as.data.frame(matrix(data = c(1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0),ncol = 4))
-  names(mutation.matrix)<- c("V1","V2","V3","V4")
+  colnames(mutation.matrix)<- c("V1","V2","V3","V4")
   PositionList <- data.frame(Residue = Residue, Can.Count = Can.Count, SideChain = SideChain, XCoord = XCoord, YCoord = YCoord, ZCoord = ZCoord)
   
   checkEquals(length(GraphClust(mutation.matrix, PositionList)), 8)
