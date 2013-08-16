@@ -3,7 +3,6 @@ function(mutation.data, position.data, insertion.type = "cheapest_insertion",
                       alpha = 0.05, MultComp = "Bonferroni", fix.start.pos = "Y",
                       Include.Culled = "Y", Include.Full = "Y"){
   
-
   ####################################
   #Gets the missing positions mtatrix#
   ####################################
@@ -84,7 +83,7 @@ function(mutation.data, position.data, insertion.type = "cheapest_insertion",
     if(inherits(try(culled.results<- rbind(nmc(mutation.data.culled, alpha=alpha,multtest = MultComp))),"try-error")==TRUE){
       culled.results <- "ERROR! Error While running clustering on the full linear protein! Verify that your mutation data matrix is not all 0's!"
     }else{
-      path <- as.numeric(mapply(function(x){substring(x,2)}, names(mutation.data.culled)))
+      path <- as.numeric(mapply(function(x){substring(x,2)}, colnames(mutation.data.culled)))
       if(!is.null(culled.results)){
         if(is.null(dim(culled.results))){
           column.names <- names(culled.results)

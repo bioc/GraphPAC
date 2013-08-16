@@ -8,7 +8,7 @@ test_unmap.clusters  <- function() {
   
   path.data <- c(1,2,3,4)
   mutation.data <-as.data.frame(matrix(data = c(1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0),ncol = 4))
-  names(mutation.data)<- c("V1","V2","V3","V4")
+  colnames(mutation.data)<- c("V1","V2","V3","V4")
   position.data <- data.frame(Residue = Residue, Can.Count = Can.Count, SideChain = SideChain, XCoord = XCoord, YCoord = YCoord, ZCoord = ZCoord)
   
     
