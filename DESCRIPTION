@@ -9,6 +9,6 @@ Maintainer: Gregory Ryslik <gregory.ryslik@yale.edu>
 Description: Identifies mutational clusters of amino acids in a protein while utilizing the proteins tertiary structure via a graph theoretical model.
 biocViews: Bioinformatics, Clustering, BiologicalDomains, Proteomics
 License: GPL-2
-Depends: R(>= 2.15),iPAC, igraph, TSP, RMallow
+Depends: R(>= 2.15),iPAC, igraph, TSP,  
 Suggests: RUnit, BiocGenerics
 Repository: Bioconductor
