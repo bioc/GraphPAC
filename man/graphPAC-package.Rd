@@ -36,7 +36,7 @@ Bioconductor: Open software development for computational biology and bioinforma
 \examples{
 \dontrun{
 #Load the positional and mutatioanl data
-CIF<-"http://www.pdb.org/pdb/files/3GFT.cif"
+CIF<-"https://files.rcsb.org/view/3GFT.cif"
 Fasta<-"http://www.uniprot.org/uniprot/P01116-2.fasta"
 KRAS.Positions<-get.Positions(CIF,Fasta, "A")
 data(KRAS.Mutations)
