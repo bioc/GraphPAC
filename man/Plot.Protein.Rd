@@ -44,7 +44,7 @@ Csardi G, Nepusz T: The igraph software package for complex network research, In
 \examples{
 \dontrun{
 #Loads the mutational and positional data
-CIF<-"http://www.pdb.org/pdb/files/3GFT.cif"
+CIF<-"https://files.rcsb.org/view/3GFT.cif"
 Fasta<-"http://www.uniprot.org/uniprot/P01116-2.fasta"
 KRAS.Positions<-get.Positions(CIF,Fasta, "A")
 data(KRAS.Mutations)

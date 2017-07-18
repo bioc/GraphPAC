@@ -2,8 +2,8 @@ Package: GraphPAC
 Type: Package
 Title: Identification of Mutational Clusters in Proteins via a Graph
         Theoretical Approach.
-Version: 1.19.0
-Date: 2012-12-9
+Version: 1.19.1
+Date: 2017-07-18
 Author: Gregory Ryslik, Hongyu Zhao
 Maintainer: Gregory Ryslik <gregory.ryslik@yale.edu>
 Description: Identifies mutational clusters of amino acids in a protein

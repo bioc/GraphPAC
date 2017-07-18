@@ -12,3 +12,9 @@
     \item Due to COSMIC change in the way the FASTA files are displayed, the examples now pull information from Uniprot.
   }
 }
+
+\section{Release Notes for version 1.19.1 - 2017.07.18}{
+  \itemize{
+    \item Url corrections for new pdb.org website file structure.
+  }
+}
