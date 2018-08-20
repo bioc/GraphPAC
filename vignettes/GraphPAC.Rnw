@@ -64,7 +64,7 @@ library(GraphPAC)
 #Extract the data from a CIF file and match it up with the canonical protein sequence.
 #Here we use the 3GFT structure from the PDB, which corresponds to the KRAS protein.
 CIF<-"https://files.rcsb.org/view/3GFT.cif"
-Fasta<-"http://www.uniprot.org/uniprot/P01116-2.fasta"
+Fasta<-"https://www.uniprot.org/uniprot/P01116-2.fasta"
 KRAS.Positions<-get.Positions(CIF,Fasta, "A")
 
 #Load the mutational data for KRAS. Here the mutational data was obtained from the
